@@ -105,6 +105,13 @@ int main(int argc, const char **argv)
     info_disable_all(INFO_LEVEL_ALL);
     info_enable(INFO_rename, INFO_LEVEL_TEXT);
 
+    Str source = {0};
+    Str destination = {0};
+    Str outfolder = {0};
+    Str tmpfolder = {0};
+    VFileDate origins = {0};
+    VStr subdirs = {0};
+
     Arg arg = {0};
     TRYC(arg_parse(&arg, argc, argv));
     if(arg.exit_early) goto clean;
@@ -119,8 +126,6 @@ int main(int argc, const char **argv)
     }
 
 
-    VFileDate origins = {0};
-    VStr subdirs = {0};
     TRYC(file_exec(&arg.parsed.input, &subdirs, true, check_file, &origins));
     while(vstr_length(&subdirs)) {
         Str pop = {0};
@@ -131,9 +136,7 @@ int main(int argc, const char **argv)
     }
 
     vfiledate_sort(&origins);
-    Str destination = {0};
-    Str source = {0};
-    Str outfolder = {0};
+
     TRYC(str_copy(&outfolder, &arg.parsed.output));
     if(str_get_back(&outfolder) != '/') {
         TRYC(str_push_back(&outfolder, '/'));
@@ -144,12 +147,11 @@ int main(int argc, const char **argv)
     if (folder == 0) {
         folder = "/tmp";
     }
-    Str tmp_dir = {0};
-    TRYC(str_fmt(&tmp_dir, "%s/mpv-shotXXXX/", folder));
+    TRYC(str_fmt(&tmpfolder, "%s/mpv-shotXXXX/", folder));
 
     struct stat st = {0};
-    if (stat(tmp_dir.s, &st) == -1) {
-        mkdir(tmp_dir.s, 0700);
+    if (stat(tmpfolder.s, &st) == -1) {
+        mkdir(tmpfolder.s, 0700);
     }
     
     if(stat(outfolder.s, &st) == -1) {
@@ -160,7 +162,7 @@ int main(int argc, const char **argv)
     size_t n = 1;
     for(size_t i = 0; i < vfiledate_length(&origins); ++i, ++n) {
         str_clear(&destination);
-        TRYC(str_fmt(&destination, "%.*smpv-shot%04zu.jpg", STR_F(&tmp_dir), n));
+        TRYC(str_fmt(&destination, "%.*smpv-shot%04zu.jpg", STR_F(&tmpfolder), n));
         FileDate *origin = vfiledate_get_at(&origins, i);
         info(INFO_rename, "'%.*s' <- '%.*s' (%zu)", STR_F(&destination), STR_F(&origin->filename), origin->date);
         int r = file_move(&origin->filename, &destination);
@@ -184,7 +186,7 @@ int main(int argc, const char **argv)
     for(size_t i = 0; i < vfiledate_length(&origins); ++i, ++n) {
         str_clear(&source);
         str_clear(&destination);
-        TRYC(str_fmt(&source, "%.*smpv-shot%04zu.jpg", STR_F(&tmp_dir), i + 1));
+        TRYC(str_fmt(&source, "%.*smpv-shot%04zu.jpg", STR_F(&tmpfolder), i + 1));
         TRYC(str_fmt(&destination, "%.*smpv-shot%04zu.jpg", STR_F(&outfolder), n));
         FileDate *origin = vfiledate_get_at(&origins, i);
         if(0) continue;
@@ -203,7 +205,14 @@ int main(int argc, const char **argv)
     }
 
 clean:
+    str_free(&tmpfolder);
+    str_free(&source);
     str_free(&destination);
+    str_free(&outfolder);
+    vfiledate_free(&origins);
+    vstr_free(&subdirs);
+    arg_free(&arg);
+    info_handle_abort();
     return err;
 error:
     ERR_CLEAN;

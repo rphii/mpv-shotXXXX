@@ -21,19 +21,19 @@ CC      := gcc
 CFLAGS  := -Wall -Wextra -Wimplicit -Wfatal-errors -std=gnu2x \
 		   -Wno-unused-parameter \
 		   -DPROC_COUNT=$(shell nproc --all) \
-		   ${OPTIMIZE} $(JEMALLOC) \
+		   -Og -rdynamic -ggdb3 \
 		   ##############\
 		   -Og -fsanitize=address -rdynamic -ggdb3 \
-		   -Og -rdynamic -ggdb3 \
+		   ${OPTIMIZE} $(JEMALLOC) \
 		   -DCOLORPRINT_DISABLE \
 		   -pg -rdynamic \
 		   ###############
 LDFLAGS := \
 		   -lm \
-		   ${OPTIMIZE} $(JEMALLOC) \
+		   -Og -rdynamic -ggdb3 \
 		   ##############\
 		   -Og -fsanitize=address -rdynamic -ggdb3 \
-		   -Og -rdynamic -ggdb3 \
+		   ${OPTIMIZE} $(JEMALLOC) \
 		   ${OPTIMIZE} $(JEMALLOC) \
 		   -pg -rdynamic \
 		   ##############

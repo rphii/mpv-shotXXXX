@@ -396,6 +396,7 @@ int arg_parse(Arg *args, size_t argc, const char **argv) /* {{{ */
     if(str_length(&args->unknown)) {
         THROW("unknown arguments"); //: %.*s", STR_F(&args->unknown));
     }
+    if(args->exit_early) return 0;
     err_index = 0;
     /* post processing */
     str_trim(&args->parsed.input);
