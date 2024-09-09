@@ -1,6 +1,6 @@
 *.o
 *.d
-src/cft
+src/mpv-shotXXXX
 *.txt
 data
 *.vim
