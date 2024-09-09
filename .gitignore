@@ -1,0 +1,10 @@
+*.o
+*.d
+src/cft
+*.txt
+data
+*.vim
+*.swp
+src/callgrind.out.*
+temp
+
