@@ -26,8 +26,8 @@ static const char *static_desc[] = {
     [ARG_NONE] = 0,
     [ARG_HELP] = "print this help",
     [ARG_VERSION] = "display the version",
-    [ARG_OUTPUT] = "specify main file to be parsed",
-    [ARG_INPUT] = "specify additional input files",
+    [ARG_OUTPUT] = "specify output directory, has to exist",
+    [ARG_INPUT] = "specify input path to be recursively searched",
 };
 
 static const char static_version[] = ""
