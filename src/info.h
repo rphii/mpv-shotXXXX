@@ -9,6 +9,7 @@ typedef enum {
 
     INFO_syscmd_failed,
     INFO_skipping_nofile_nodir,
+    INFO_retrying,
     INFO_directory,
     INFO_file_found,
     INFO_file_sorting,

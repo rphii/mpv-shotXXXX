@@ -71,32 +71,29 @@ int file_move(Str *src, Str *dst)
 {
     struct stat file_stat;
     
-    // Step 1: Get the original file's timestamps
-    if (stat(src->s, &file_stat) != 0) {
+    if(stat(src->s, &file_stat) != 0) {
         info_check(INFO_rename, false);
-        perror(">>> Stat Failed");
+        info(INFO_syscmd_failed, ">>> stat Failed: %s", strerror(errno));
         return -1;
     }
 
-    // Step 2: Move (rename) the file
-    if (rename(src->s, dst->s) != 0) {
+    if(rename(src->s, dst->s) != 0) {
         info_check(INFO_rename, false);
-        perror(">>> Rename Failed");
+        info(INFO_syscmd_failed, ">>> rename Failed: %s", strerror(errno));
         return -1;
     }
     info_check(INFO_rename, true);
 
-    // Step 3: Set the original file's timestamps on the new file
     struct utimbuf new_times;
     new_times.actime = file_stat.st_atime;  // Access time
     new_times.modtime = file_stat.st_mtime; // Modification time
 
     if (utime(dst->s, &new_times) != 0) {
-        perror("utime failed");
+        info(INFO_syscmd_failed, ">>> utime Failed: %s", strerror(errno));
         return -1;
     }
 
-    return 0; // Success
+    return 0;
 }
 
 int main(int argc, const char **argv)
@@ -104,9 +101,12 @@ int main(int argc, const char **argv)
     int err = 0;
 
     info_disable_all(INFO_LEVEL_ALL);
+    info_disable_all(INFO_LEVEL_ALL);
     info_enable(INFO_rename, INFO_LEVEL_TEXT);
     info_enable(INFO_file_found, INFO_LEVEL_TEXT);
     info_enable(INFO_file_sorting, INFO_LEVEL_TEXT);
+    info_enable(INFO_syscmd_failed, INFO_LEVEL_TEXT);
+    info_enable(INFO_retrying, INFO_LEVEL_TEXT);
     //info_enable(INFO_directory, INFO_LEVEL_TEXT);
 
     Str source = {0};
@@ -174,7 +174,7 @@ int main(int argc, const char **argv)
         if(r) {
             if(errno == EISDIR) {
                 //printff("'%.*s' is a directory", STR_F(&destination));
-                fprintf(stderr, ">>> Retrying on Next ...\n");
+                info(INFO_retrying, ">>> Retrying on Next ...");
                 --i;
             } else {
                 THROW("unhandled errno: %u", errno);
@@ -197,7 +197,7 @@ int main(int argc, const char **argv)
             if(errno == EISDIR) {
                 //printff("'%.*s' is a directory", STR_F(&destination));
                 --i;
-                fprintf(stderr, ">>> Retrying on Next ...\n");
+                info(INFO_retrying, ">>> Retrying on Next ...");
             } else {
                 THROW("unhandled errno: %u", errno);
             }
