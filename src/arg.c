@@ -430,7 +430,7 @@ void arg_help(Arg *arg) /* {{{ */
     ASSERT(arg, ERR_NULL_ARG);
     int err = 0;
     Str ts = {0};
-    TRYC(str_fmt(&ts, F("%s:", BOLD) " tag managing application.", arg->name));
+    TRYC(str_fmt(&ts, F("%s:", BOLD) " find mpv-shotXXXX.jpg files and move them all into one folder.", arg->name));
     print_line(arg->tabs.max, 0, 0, &ts);
     str_clear(&ts);
     printf("\n\n");
