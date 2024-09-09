@@ -60,6 +60,7 @@ int check_file(Str *file, void *data)
     if(r) return -1;
     fd.date = s.st_mtime;
 
+    info(INFO_file_found, "Found file '%.*s'", STR_F(&fd.filename));
     TRY(vfiledate_push_back(arr, &fd), ERR_VEC_PUSH_BACK);
     return 0;
 error:
@@ -104,6 +105,9 @@ int main(int argc, const char **argv)
 
     info_disable_all(INFO_LEVEL_ALL);
     info_enable(INFO_rename, INFO_LEVEL_TEXT);
+    info_enable(INFO_file_found, INFO_LEVEL_TEXT);
+    info_enable(INFO_file_sorting, INFO_LEVEL_TEXT);
+    //info_enable(INFO_directory, INFO_LEVEL_TEXT);
 
     Str source = {0};
     Str destination = {0};
@@ -135,6 +139,7 @@ int main(int argc, const char **argv)
         str_free(&pop);
     }
 
+    info(INFO_file_sorting, "Sorting the files");
     vfiledate_sort(&origins);
 
     TRYC(str_copy(&outfolder, &arg.parsed.output));
@@ -177,10 +182,6 @@ int main(int argc, const char **argv)
         } else {
         }
     }
-
-    //if(stat(outfolder.s, &st) == -1) {
-    //    mkdir(outfolder.s, 0700);
-    //}
 
     n = 1;
     for(size_t i = 0; i < vfiledate_length(&origins); ++i, ++n) {

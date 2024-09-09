@@ -220,6 +220,7 @@ ErrDecl file_exec(Str *dirname, VStr *subdirs, bool recursive, FileFunc exec, vo
         struct dirent *dp = 0;
         char cdir[FILE_PATH_MAX];
         str_cstr(dirname, cdir, FILE_PATH_MAX);
+        info(INFO_directory, "Directory '%s'", cdir);
         if((dir = opendir(cdir)) == NULL) {
             goto clean;
             THROW("can't open directory '%.*s'", (int)len, cdir);
